@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Search } from "lucide-react";
 
 interface SearchBarProps {
@@ -21,24 +21,25 @@ interface SearchBarProps {
  *  - defaultValue seeds the input from the URL on first render, so the
  *    field is pre-filled after a page refresh.
  */
-export function SearchBar({ defaultValue }: SearchBarProps) {
+export function SearchBar({ defaultValue }: { defaultValue?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
 
   const handleSearch = useCallback(
     (term: string) => {
-      // Clone existing params to preserve any other query-string values
-      const params = new URLSearchParams(searchParams.toString());
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-      if (term.trim()) {
-        params.set("query", term.trim());
-      } else {
-        params.delete("query");
-      }
-
-      // Replace instead of push — no history entry per keystroke
-      router.replace(`${pathname}?${params.toString()}`);
+      timeoutRef.current = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (term.trim()) {
+          params.set("query", term.trim());
+        } else {
+          params.delete("query");
+        }
+        router.replace(`${pathname}?${params.toString()}`);
+      }, 300);
     },
     [router, pathname, searchParams],
   );

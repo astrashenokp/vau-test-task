@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -52,8 +53,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
+  const contextValue = useMemo(
+    () => ({ items, addToCart, totalItems }),
+    [items, addToCart, totalItems]
+  );
+
   return (
-    <CartContext.Provider value={{ items, addToCart, totalItems }}>
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

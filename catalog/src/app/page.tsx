@@ -9,7 +9,7 @@ import { ProductList } from "@/components/catalog/ProductList";
  * In Next.js 14 this was a plain object; the async pattern works on both.
  */
 interface PageProps {
-  searchParams: Promise<{ query?: string }>;
+  searchParams: Promise<{ query?: string | string[] }>;
 }
 
 /**
@@ -29,11 +29,13 @@ interface PageProps {
  */
 export default async function Page({ searchParams }: PageProps) {
   const { query } = await searchParams;
+  // Next.js searchParams can be an array if ?query=a&query=b
+  const queryStr = Array.isArray(query) ? query[0] : query;
   const allProducts = await getProducts();
 
-  const products = query
+  const products = queryStr
     ? allProducts.filter((p) =>
-        p.title.toLowerCase().includes(query.toLowerCase()),
+        p.title.toLowerCase().includes(queryStr.toLowerCase()),
       )
     : allProducts;
 
@@ -59,12 +61,12 @@ export default async function Page({ searchParams }: PageProps) {
               </div>
             }
           >
-            <SearchBar defaultValue={query} />
+            <SearchBar defaultValue={queryStr} />
           </Suspense>
 
           {products.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-12">
-              Товарів за запитом &ldquo;{query}&rdquo; не знайдено.
+              Товарів за запитом &ldquo;{queryStr}&rdquo; не знайдено.
             </p>
           ) : (
             <ProductList products={products} />
