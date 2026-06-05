@@ -1,6 +1,8 @@
-import { getProducts } from "@/lib/api/products";
 import { TopNav } from "@/components/layout/TopNav";
 import { ProductList } from "@/components/catalog/ProductList";
+import type { Product } from "@/lib/types/product";
+
+const API_URL = "https://6a22f0fa5c610353286a8f6e.mockapi.io/products";
 
 /**
  * Root page — intentionally a Server Component (no "use client" directive).
@@ -12,7 +14,13 @@ import { ProductList } from "@/components/catalog/ProductList";
  *  4. While awaiting, Next.js renders `loading.tsx` as the Suspense fallback.
  */
 export default async function Page() {
-  const products = await getProducts();
+  const res = await fetch(API_URL, { cache: "no-store" });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
+  }
+
+  const products: Product[] = await res.json();
 
   return (
     <main className="min-h-screen bg-gray-100">
