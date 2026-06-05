@@ -1,26 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import type { Product } from "@/lib/types/product";
 import { formatPrice } from "@/lib/utils/price";
 import { Modal } from "@/components/ui/Modal";
 
 /**
- * Props are the full Product so the Modal receives a complete object
- * without reconstructing it from partial pieces.
+ * Props are the full Product so the Modal receives a complete object.
  */
 type ProductCardProps = Product;
 
 /**
- * Interactive product card — marked "use client" because it:
+ * Interactive product card — "use client" because it:
  *  1. Tracks modal open/close state with useState.
- *  2. Passes an onClick handler to the CTA button.
+ *  2. Attaches an onClick handler to the CTA button.
  *
- * Hover micro-interactions are done with Tailwind `group` utilities:
- *  - Card lifts 4px on hover (`hover:-translate-y-1`) with a drop shadow.
- *  - Product image subtly scales up (`group-hover:scale-105`).
- *  - Button darkens slightly (`hover:brightness-90`).
+ * Image strategy:
+ *  - Uses next/image <Image fill> inside a positioned container.
+ *  - `fill` avoids hardcoding dimensions we don't know at build time.
+ *  - `sizes` tells the browser which image width to download at each viewport,
+ *    avoiding downloading a 4× larger image than needed.
+ *  - `object-contain` preserves aspect ratio (product images vary in shape).
+ *
+ * Hover micro-interactions via Tailwind `group` utilities:
+ *  - Card lifts 4px + drop shadow on hover.
+ *  - Image scales subtly on hover (overflow-hidden clips the scale).
+ *  - Button darkens on hover.
  */
 export function ProductCard({ id, imageUrl, title, price }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,20 +37,20 @@ export function ProductCard({ id, imageUrl, title, price }: ProductCardProps) {
     <>
       {/* ── Card ──────────────────────────────────────────── */}
       <div className="group flex flex-col bg-white border border-gray-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-        {/* Image container */}
-        <div className="aspect-square w-full flex items-center justify-center p-4 bg-white overflow-hidden">
-          <img
+        {/* Image — relative container required by next/image fill */}
+        <div className="relative aspect-square w-full overflow-hidden bg-white p-2">
+          <Image
             src={imageUrl}
             alt={title}
-            loading="lazy"
-            decoding="async"
-            className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 1200px) 25vw, 300px"
+            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
         {/* Body */}
         <div className="px-3 pb-3 flex flex-col flex-1">
-          {/* Title — clamped to 2 lines so all rows stay aligned */}
+          {/* Title — clamped to 2 lines so all grid rows align */}
           <p className="text-[11px] text-gray-500 leading-snug mb-2 min-h-[30px] line-clamp-2">
             {title}
           </p>
