@@ -55,7 +55,7 @@ export function ProductCard({ id, imageUrl, title, price }: ProductCardProps) {
       {/* ── Card ──────────────────────────────────────────── */}
       <div className="group flex flex-col bg-white border border-gray-200 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
         {/* Image — relative container required by next/image fill */}
-        <div className="relative aspect-square w-full overflow-hidden bg-white p-2">
+        <div className="relative aspect-square w-full overflow-hidden bg-white">
           <Image
             src={imageUrl}
             alt={title}

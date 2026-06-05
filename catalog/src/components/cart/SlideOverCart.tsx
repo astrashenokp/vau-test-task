@@ -91,13 +91,13 @@ export function SlideOverCart() {
               {items.map((item) => (
                 <li key={item.id} className="flex gap-4">
                   {/* Image */}
-                  <div className="relative w-20 h-20 bg-gray-50 flex-shrink-0 border border-gray-100 p-1">
+                  <div className="relative w-20 h-20 bg-gray-50 flex-shrink-0 border border-gray-100 overflow-hidden rounded-sm">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
                       fill
                       sizes="80px"
-                      className="object-contain"
+                      className="object-contain p-1"
                     />
                   </div>
 
