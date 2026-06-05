@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getProducts } from "@/lib/api/products";
 import { TopNav } from "@/components/layout/TopNav";
 import { SearchBar } from "@/components/catalog/SearchBar";
+import { SortDropdown } from "@/components/catalog/SortDropdown";
 import { ProductList } from "@/components/catalog/ProductList";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ interface PageProps {
   searchParams: Promise<{
     query?: string | string[];
     category?: string | string[];
+    sort?: string | string[];
   }>;
 }
 
@@ -48,10 +50,11 @@ export default async function Page({ searchParams }: PageProps) {
   const rawParams = await searchParams;
   const query = normalise(rawParams.query);
   const category = normalise(rawParams.category);
+  const sort = normalise(rawParams.sort);
 
   const allProducts = await getProducts();
 
-  const products = allProducts.filter((p) => {
+  let products = allProducts.filter((p) => {
     const titleLower = p.title.toLowerCase();
 
     // Category filter (case-insensitive title substring)
@@ -66,6 +69,13 @@ export default async function Page({ searchParams }: PageProps) {
 
     return true;
   });
+
+  // Apply Sorting
+  if (sort === "asc") {
+    products.sort((a, b) => a.price - b.price);
+  } else if (sort === "desc") {
+    products.sort((a, b) => b.price - a.price);
+  }
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -83,24 +93,32 @@ export default async function Page({ searchParams }: PageProps) {
         </Suspense>
 
         <div className="p-6">
-          {/*
-           * SearchBar calls useSearchParams() — also needs its own Suspense.
-           * Fallback is a visually identical disabled input.
-           */}
-          <Suspense
-            fallback={
-              <div className="relative mb-4">
-                <input
-                  type="search"
-                  disabled
-                  placeholder="Пошук товарів..."
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 placeholder:text-gray-300"
-                />
-              </div>
-            }
-          >
-            <SearchBar defaultValue={query} />
-          </Suspense>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="w-full sm:w-96">
+              <Suspense
+                fallback={
+                  <div className="relative">
+                    <input
+                      type="search"
+                      disabled
+                      placeholder="Пошук товарів..."
+                      className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 placeholder:text-gray-300"
+                    />
+                  </div>
+                }
+              >
+                <SearchBar defaultValue={query} />
+              </Suspense>
+            </div>
+
+            <Suspense
+              fallback={
+                <div className="w-48 h-[34px] bg-gray-200 animate-pulse" />
+              }
+            >
+              <SortDropdown />
+            </Suspense>
+          </div>
 
           {products.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-12">
