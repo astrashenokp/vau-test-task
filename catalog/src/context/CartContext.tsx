@@ -19,20 +19,21 @@ export interface CartItem extends Product {
 interface CartState {
   items: CartItem[];
   totalItems: number;
+  totalPrice: number;
+  isCartOpen: boolean;
 }
 
 interface CartDispatch {
   addToCart: (product: Product) => void;
+  removeFromCart: (id: string) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
+  openCart: () => void;
+  closeCart: () => void;
 }
 
 // ── Contexts ───────────────────────────────────────────────────────────────
 
-/**
- * Split contexts: one for state, one for dispatch.
- * This is a critical performance optimisation. It prevents all ProductCards
- * (which only need addToCart) from re-rendering every time the cart state
- * (items/totalItems) changes.
- */
 const CartStateContext = createContext<CartState | null>(null);
 const CartDispatchContext = createContext<CartDispatch | null>(null);
 
@@ -40,6 +41,9 @@ const CartDispatchContext = createContext<CartDispatch | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // -- Actions --
 
   const addToCart = useCallback((product: Product) => {
     setItems((prev) => {
@@ -55,16 +59,59 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const removeFromCart = useCallback((id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  const increaseQuantity = useCallback((id: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+      )
+    );
+  }, []);
+
+  const decreaseQuantity = useCallback((id: string) => {
+    setItems((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+        )
+        // Automatically remove if quantity hits 0
+        .filter((item) => item.quantity > 0)
+    );
+  }, []);
+
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
+
+  // -- Computed State --
+
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const stateValue = useMemo(
-    () => ({ items, totalItems }),
-    [items, totalItems]
+    () => ({ items, totalItems, totalPrice, isCartOpen }),
+    [items, totalItems, totalPrice, isCartOpen]
   );
 
   const dispatchValue = useMemo(
-    () => ({ addToCart }),
-    [addToCart]
+    () => ({
+      addToCart,
+      removeFromCart,
+      increaseQuantity,
+      decreaseQuantity,
+      openCart,
+      closeCart,
+    }),
+    [
+      addToCart,
+      removeFromCart,
+      increaseQuantity,
+      decreaseQuantity,
+      openCart,
+      closeCart,
+    ]
   );
 
   return (
