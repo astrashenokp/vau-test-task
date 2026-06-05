@@ -13,11 +13,15 @@
 import { type ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { CartProvider } from "@/context/CartContext";
+import { SlideOverCart } from "@/components/cart/SlideOverCart";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <CartProvider>
       {children}
+      
+      {/* Global Slide-over Cart */}
+      <SlideOverCart />
 
       {/*
        * Toaster must live inside a Client Component tree.
