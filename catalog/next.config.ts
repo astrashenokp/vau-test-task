@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
      *
      * Never use { hostname: '**' } — that disables the security benefit.
      */
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
