@@ -55,7 +55,7 @@ export function SearchBar({ defaultValue }: { defaultValue?: string }) {
         placeholder="Пошук товарів..."
         defaultValue={defaultValue}
         onChange={(e) => handleSearch(e.target.value)}
-        className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 outline-none focus:border-lime-brand transition-colors placeholder:text-gray-400"
+        className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 outline-none focus:ring-2 focus:ring-lime-brand/50 focus:border-lime-brand transition-shadow placeholder:text-gray-400"
       />
     </div>
   );
