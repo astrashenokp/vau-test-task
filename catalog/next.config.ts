@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.blob.vercel-storage.com",
       },
+      {
+        // mockapi.io uses loremflickr.com as its default image CDN
+        protocol: "https",
+        hostname: "loremflickr.com",
+      },
     ],
   },
 };
