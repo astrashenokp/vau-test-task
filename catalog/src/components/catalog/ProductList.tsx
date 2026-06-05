@@ -13,12 +13,7 @@ export function ProductList({ products }: ProductListProps) {
   return (
     <div className="min-w-[1024px] grid grid-cols-4 gap-4">
       {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          imageUrl={product.imageUrl}
-          title={product.title}
-          price={product.price}
-        />
+        <ProductCard key={product.id} {...product} />
       ))}
     </div>
   );
