@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import type { Product } from "@/lib/types/product";
 import { formatPrice } from "@/lib/utils/price";
 import { Modal } from "@/components/ui/Modal";
-import { useCart } from "@/context/CartContext";
+import { useCartDispatch } from "@/context/CartContext";
 
 /**
  * Props are the full Product so the Modal receives a complete object.
@@ -17,7 +17,7 @@ type ProductCardProps = Product;
 /**
  * Interactive product card — "use client" because it:
  *  1. Tracks modal open/close state with useState.
- *  2. Calls useCart() to add items and fire toast notifications.
+ *  2. Calls useCartDispatch() to add items without triggering re-renders on cart state changes.
  *
  * Two ways to add to cart from this card:
  *  a. Cart icon button (quick-add, no modal needed)
@@ -36,7 +36,7 @@ type ProductCardProps = Product;
  */
 export function ProductCard({ id, imageUrl, title, price }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { addToCart } = useCart();
+  const { addToCart } = useCartDispatch();
   const product: Product = { id, imageUrl, title, price };
 
   /**

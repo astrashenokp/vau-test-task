@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Product } from "@/lib/types/product";
 import { formatPrice } from "@/lib/utils/price";
-import { useCart } from "@/context/CartContext";
+import { useCartDispatch } from "@/context/CartContext";
 
 interface ModalProps {
   product: Product;
@@ -24,7 +24,7 @@ interface ModalProps {
  */
 export function Modal({ product, onClose }: ModalProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
-  const { addToCart } = useCart();
+  const { addToCart } = useCartDispatch();
 
   // Close on Escape
   useEffect(() => {
