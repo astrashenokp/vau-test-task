@@ -8,3 +8,9 @@ export interface Product {
   price: number;
   imageUrl: string;
 }
+
+/**
+ * Payload for creating a new product via POST.
+ * Omits `id` — MockAPI generates it server-side.
+ */
+export type CreateProductPayload = Omit<Product, "id">;
